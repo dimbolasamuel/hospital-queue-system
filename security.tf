@@ -23,7 +23,7 @@ resource "aws_wafv2_web_acl" "example_acl" {
               search_string = "POST"
               text_transformation {
                 priority = 0
-                type = "NONE"
+                type     = "NONE"
               }
             }
           },
@@ -40,7 +40,7 @@ resource "aws_wafv2_web_acl" "example_acl" {
                   positional_constraint = "CONTAINS"
                   text_transformation {
                     priority = 0
-                    type = "NONE"
+                    type     = "NONE"
                   }
                 }
               }
@@ -56,4 +56,15 @@ resource "aws_wafv2_web_acl" "example_acl" {
       metric_name                = "webAclMetric"
     }
   }
+
+  default_action {
+    allow {}
+  }
+
+  visibility_config {
+    sampled_requests_enabled   = true
+    cloudwatch_metrics_enabled = true
+    metric_name                = "webAclMetric"
+  }
 }
+
