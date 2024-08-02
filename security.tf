@@ -1,69 +1,107 @@
-resource "aws_wafv2_web_acl" "example_acl" {
-  name        = "example-web-acl"
-  scope       = "REGIONAL"
-  description = "Example Web ACL"
+# Configure AWS Provider
+provider "aws" {
+  region = "ca-central-1"
+}
 
-  rule {
-    name     = "block-post-requests-content-type-application-json"
-    priority = 1
+# Create WAF
+resource "aws_waf" "hospital_queue_waf" {
+  name        = "hospital-queue-waf"
+  metric_name = "hospitalQueueWAF"
+}
 
-    action {
-      block {}
+# Create WAF Rule to block SQL Injection
+resource "aws_waf_rule" "sql_injection_rule" {
+  name        = "sql-injection-rule"
+  metric_name = "sqlInjectionRule"
+
+  predicates {
+    data_id = (link unavailable)
+    negated = false
+    type    = "ByteMatch"
+  }
+}
+
+# Create WAF SQL Injection Match Set
+resource "aws_waf_sql_injection_match_set" "sql_injection_match_set" {
+  name = "sql-injection-match-set"
+
+  sql_injection_match_tuple {
+    field_to_match {
+      type = "URI"
     }
-
-    statement {
-      and_statement {
-        statements = [
-          {
-            byte_match_statement {
-              search_string = "POST"
-              field_to_match {
-                method {}
-              }
-              positional_constraint = "CONTAINS"
-              text_transformation {
-                priority = 0
-                type     = "NONE"
-              }
-            }
-          },
-          {
-            not_statement {
-              statement {
-                byte_match_statement {
-                  search_string = "application/json"
-                  field_to_match {
-                    single_header {
-                      name = "content-type"
-                    }
-                  }
-                  positional_constraint = "CONTAINS"
-                  text_transformation {
-                    priority = 0
-                    type     = "NONE"
-                  }
-                }
-              }
-            }
-          }
-        ]
-      }
-    }
-
-    visibility_config {
-      sampled_requests_enabled   = true
-      cloudwatch_metrics_enabled = true
-      metric_name                = "webAclMetric"
+    text_transformation {
+      priority = 0
+      type     = "NONE"
     }
   }
+}
+
+# Create WAF Web ACL
+resource "aws_waf_web_acl" "hospital_queue_web_acl" {
+  name        = "hospital-queue-web-acl"
+  metric_name = "hospitalQueueWebACL"
 
   default_action {
-    allow {}
+    type = "ALLOW"
   }
 
-  visibility_config {
-    sampled_requests_enabled   = true
-    cloudwatch_metrics_enabled = true
-    metric_name                = "webAclMetric"
+  rule {
+    priority = 1
+    rule_id  = (link unavailable)
+    type     = "REGULAR"
+  }
+}
+
+# Associate WAF Web ACL with ALB
+resource "aws_alb" "hospital_queue_alb" {
+  name            = "hospital-queue-alb"
+  subnets         = ["subnet-12345678", "subnet-90123456"]
+  security_groups = ["sg-12345678"]
+}
+
+resource "aws_alb_listener" "hospital_queue_listener" {
+  load_balancer_arn = aws_alb.hospital_queue_alb.arn
+  port              = 80
+  protocol          = "HTTP"
+
+  default_action {
+    target_group_arn = aws_alb_target_group.hospital_queue_target_group.arn
+    type             = "forward"
+  }
+}
+
+resource "aws_alb_listener_rule" "hospital_queue_listener_rule" {
+  listener_arn = aws_alb_listener.hospital_queue_listener.arn
+  priority     = 1
+
+  action {
+    type             = "forward"
+    target_group_arn = aws_alb_target_group.hospital_queue_target_group.arn
+  }
+
+  condition {
+    field  = "host-header"
+    values = ["(link unavailable)"]
+  }
+}
+
+resource "aws_alb_target_group" "hospital_queue_target_group" {
+  name     = "hospital-queue-target-group"
+  port     = 80
+  protocol = "HTTP"
+  vpc_id   = "vpc-12345678"
+}
+
+# Associate WAF Web ACL with ALB Listener
+resource "aws_alb_listener_rule" "hospital_queue_waf_rule" {
+  listener_arn = aws_alb_listener.hospital_queue_listener.arn
+  priority     = 2
+
+  action {
+    type = "waf"
+    waf  {
+      id   = (link unavailable)
+      type = "AWS"
+    }
   }
 }
