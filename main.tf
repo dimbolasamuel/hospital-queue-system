@@ -9,6 +9,6 @@ terraform {
 }
 
 provider "aws" {
-  region = "ca-central-12"
+  region = "ca-central-1"
 }
 
