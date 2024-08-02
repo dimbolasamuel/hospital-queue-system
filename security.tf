@@ -42,7 +42,7 @@ resource "aws_waf_web_acl" "hospital_queue_web_acl" {
 
   rule {
     priority = 1
-    rule_id  = (link unavailable)
+    rule_id  = "1ceeb029-ceb6-4c60-a27b-a86bf911f034"
     type     = "REGULAR"
   }
 }
