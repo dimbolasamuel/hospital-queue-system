@@ -16,11 +16,11 @@ resource "aws_wafv2_web_acl" "example_acl" {
         statements = [
           {
             byte_match_statement {
+              search_string = "POST"
               field_to_match {
                 method {}
               }
               positional_constraint = "CONTAINS"
-              search_string = "POST"
               text_transformation {
                 priority = 0
                 type     = "NONE"
@@ -67,4 +67,3 @@ resource "aws_wafv2_web_acl" "example_acl" {
     metric_name                = "webAclMetric"
   }
 }
-
