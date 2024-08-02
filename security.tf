@@ -9,8 +9,8 @@ resource "aws_waf_rule" "sql_injection_rule" {
   name        = "sql-injection-rule"
   metric_name = "sqlInjectionRule"
 
-  predicates {
-    data_id = (link unavailable)
+   predicates {
+    data_id = "aebd8870-d71d-4ced-8c39-695c7a3f83d0"
     negated = false
     type    = "ByteMatch"
   }
