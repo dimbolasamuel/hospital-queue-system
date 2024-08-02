@@ -8,7 +8,20 @@ terraform {
   }
 }
 
+#new aws instance
 provider "aws" {
   region = "ca-central-1"
 }
 
+provider "aws" {
+  region = "ca-central-1"
+}
+
+resource "aws_instance" "Sam_instance" {
+  ami           = "ami-12345678"
+  instance_type = "t2.micro"
+
+  tags = {
+    Name = "SamInstance"
+  }
+}
