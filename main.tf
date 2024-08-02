@@ -13,10 +13,6 @@ provider "aws" {
   region = "ca-central-1"
 }
 
-provider "aws" {
-  region = "ca-central-1"
-}
-
 resource "aws_instance" "Sam_instance" {
   ami           = "ami-12345678"
   instance_type = "t2.micro"
@@ -25,3 +21,4 @@ resource "aws_instance" "Sam_instance" {
     Name = "SamInstance"
   }
 }
+
