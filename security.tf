@@ -1,8 +1,3 @@
-# Configure AWS Provider
-provider "aws" {
-  region = "ca-central-1"
-}
-
 # Create WAF
 resource "aws_waf" "hospital_queue_waf" {
   name        = "hospital-queue-waf"
